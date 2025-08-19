@@ -58,7 +58,7 @@ local Config = {
     },
     Sizes = {
         Corner = UDim.new(0, 12),
-        SmallCorner = UDim.new(0, 6),
+        SmallCorner = UDim.new(0, 6), 
         ButtonHeight = 40,
         SmallButtonHeight = 32,
         Padding = 20,
