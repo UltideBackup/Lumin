@@ -86,9 +86,20 @@ local function springTween(object, properties, duration)
     return TweenService:Create(object, info, properties)
 end
 
-local function corner(radius)
+local function corner(parent, radius)
     local c = Instance.new("UICorner")
-    c.CornerRadius = radius or Config.Sizes.Corner
+    c.Parent = parent
+    if radius then
+        if typeof(radius) == "UDim" then
+            c.CornerRadius = radius
+        elseif typeof(radius) == "number" then
+            c.CornerRadius = UDim.new(0, radius)
+        else
+            c.CornerRadius = Config.Sizes.Corner
+        end
+    else
+        c.CornerRadius = Config.Sizes.Corner
+    end
     return c
 end
 
