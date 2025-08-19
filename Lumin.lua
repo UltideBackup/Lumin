@@ -1,481 +1,646 @@
 local Lumin = {
-    version = "2.0.0",
-    tailwind = {},
-    bootstrap = {},
-    fontawesome = {},
-    globals = {},
-    components = {}
+    version = "4.0.0 - Web Engine",
+    dom = {},
+    styles = {},
+    viewport = {},
+    events = {},
+    animations = {},
+    storage = {}
 }
 
 local TweenService = game:GetService("TweenService")
-local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
-local tailwindClasses = {
-    ["bg-blue-500"] = {background = "#3B82F6"},
-    ["bg-red-500"] = {background = "#EF4444"},
-    ["bg-green-500"] = {background = "#10B981"},
-    ["bg-yellow-500"] = {background = "#F59E0B"},
-    ["bg-purple-500"] = {background = "#8B5CF6"},
-    ["bg-pink-500"] = {background = "#EC4899"},
-    ["bg-indigo-500"] = {background = "#6366F1"},
-    ["bg-gray-100"] = {background = "#F3F4F6"},
-    ["bg-gray-200"] = {background = "#E5E7EB"},
-    ["bg-gray-300"] = {background = "#D1D5DB"},
-    ["bg-gray-400"] = {background = "#9CA3AF"},
-    ["bg-gray-500"] = {background = "#6B7280"},
-    ["bg-gray-600"] = {background = "#4B5563"},
-    ["bg-gray-700"] = {background = "#374151"},
-    ["bg-gray-800"] = {background = "#1F2937"},
-    ["bg-gray-900"] = {background = "#111827"},
-    ["bg-white"] = {background = "#FFFFFF"},
-    ["bg-black"] = {background = "#000000"},
-    
-    ["text-white"] = {color = "#FFFFFF"},
-    ["text-black"] = {color = "#000000"},
-    ["text-gray-500"] = {color = "#6B7280"},
-    ["text-blue-500"] = {color = "#3B82F6"},
-    ["text-red-500"] = {color = "#EF4444"},
-    ["text-green-500"] = {color = "#10B981"},
-    
-    ["text-xs"] = {fontSize = 12},
-    ["text-sm"] = {fontSize = 14},
-    ["text-base"] = {fontSize = 16},
-    ["text-lg"] = {fontSize = 18},
-    ["text-xl"] = {fontSize = 20},
-    ["text-2xl"] = {fontSize = 24},
-    ["text-3xl"] = {fontSize = 30},
-    ["text-4xl"] = {fontSize = 36},
-    
-    ["w-4"] = {width = 16},
-    ["w-8"] = {width = 32},
-    ["w-16"] = {width = 64},
-    ["w-32"] = {width = 128},
-    ["w-64"] = {width = 256},
-    ["w-full"] = {width = "100%"},
-    ["w-1/2"] = {width = "50%"},
-    ["w-1/3"] = {width = "33%"},
-    ["w-2/3"] = {width = "66%"},
-    
-    ["h-4"] = {height = 16},
-    ["h-8"] = {height = 32},
-    ["h-16"] = {height = 64},
-    ["h-32"] = {height = 128},
-    ["h-64"] = {height = 256},
-    ["h-full"] = {height = "100%"},
-    ["h-screen"] = {height = "100vh"},
-    
-    ["p-1"] = {padding = 4},
-    ["p-2"] = {padding = 8},
-    ["p-4"] = {padding = 16},
-    ["p-6"] = {padding = 24},
-    ["p-8"] = {padding = 32},
-    
-    ["m-1"] = {margin = 4},
-    ["m-2"] = {margin = 8},
-    ["m-4"] = {margin = 16},
-    ["m-6"] = {margin = 24},
-    ["m-8"] = {margin = 32},
-    ["m-auto"] = {margin = "auto"},
-    
-    ["rounded"] = {cornerRadius = 4},
-    ["rounded-md"] = {cornerRadius = 6},
-    ["rounded-lg"] = {cornerRadius = 8},
-    ["rounded-xl"] = {cornerRadius = 12},
-    ["rounded-2xl"] = {cornerRadius = 16},
-    ["rounded-full"] = {cornerRadius = 9999},
-    
-    ["shadow-sm"] = {shadow = 1},
-    ["shadow"] = {shadow = 2},
-    ["shadow-md"] = {shadow = 3},
-    ["shadow-lg"] = {shadow = 4},
-    ["shadow-xl"] = {shadow = 5},
-    
-    ["flex"] = {layout = "flex"},
-    ["flex-col"] = {layout = "flex", direction = "column"},
-    ["flex-row"] = {layout = "flex", direction = "row"},
-    ["items-center"] = {alignItems = "center"},
-    ["justify-center"] = {justifyContent = "center"},
-    ["justify-between"] = {justifyContent = "space-between"},
-    
-    ["absolute"] = {position = "absolute"},
-    ["relative"] = {position = "relative"},
-    ["fixed"] = {position = "fixed"},
-    
-    ["opacity-0"] = {opacity = 0},
-    ["opacity-25"] = {opacity = 0.25},
-    ["opacity-50"] = {opacity = 0.5},
-    ["opacity-75"] = {opacity = 0.75},
-    ["opacity-100"] = {opacity = 1},
-    
-    ["hover:bg-blue-600"] = {hoverBackground = "#2563EB"},
-    ["hover:bg-red-600"] = {hoverBackground = "#DC2626"},
-    ["hover:scale-105"] = {hoverScale = 1.05},
-    ["transition"] = {transition = true}
-}
+local Element = {}
+Element.__index = Element
 
-local bootstrapClasses = {
-    ["btn"] = {
-        background = "#007BFF",
-        color = "#FFFFFF",
-        padding = {8, 12},
-        cornerRadius = 4,
-        fontSize = 14
-    },
-    ["btn-primary"] = {background = "#007BFF"},
-    ["btn-secondary"] = {background = "#6C757D"},
-    ["btn-success"] = {background = "#28A745"},
-    ["btn-danger"] = {background = "#DC3545"},
-    ["btn-warning"] = {background = "#FFC107"},
-    ["btn-info"] = {background = "#17A2B8"},
-    ["btn-light"] = {background = "#F8F9FA", color = "#212529"},
-    ["btn-dark"] = {background = "#343A40"},
-    
-    ["card"] = {
-        background = "#FFFFFF",
-        cornerRadius = 8,
-        shadow = 2,
-        padding = 16
-    },
-    ["card-header"] = {
-        background = "#F8F9FA",
-        padding = 12,
-        borderBottom = true
-    },
-    ["card-body"] = {padding = 16},
-    
-    ["container"] = {width = "100%", padding = {0, 15}},
-    ["container-fluid"] = {width = "100%"},
-    
-    ["row"] = {layout = "flex", direction = "row"},
-    ["col"] = {flex = 1},
-    ["col-1"] = {width = "8.33%"},
-    ["col-2"] = {width = "16.66%"},
-    ["col-3"] = {width = "25%"},
-    ["col-4"] = {width = "33.33%"},
-    ["col-6"] = {width = "50%"},
-    ["col-8"] = {width = "66.66%"},
-    ["col-12"] = {width = "100%"},
-    
-    ["text-center"] = {textAlign = "center"},
-    ["text-left"] = {textAlign = "left"},
-    ["text-right"] = {textAlign = "right"},
-    
-    ["d-flex"] = {layout = "flex"},
-    ["justify-content-center"] = {justifyContent = "center"},
-    ["align-items-center"] = {alignItems = "center"}
-}
-
-local fontAwesomeIcons = {
-    ["fa-home"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-user"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-cog"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-heart"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-star"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-search"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-plus"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-minus"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-times"] = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-    ["fa-check"] = "rbxasset://textures/ui/GuiImagePlaceholder.png"
-}
-
-local function parseClasses(classString)
-    local styles = {}
-    if not classString then return styles end
-    
-    for class in classString:gmatch("%S+") do
-        if tailwindClasses[class] then
-            for k, v in pairs(tailwindClasses[class]) do
-                styles[k] = v
-            end
-        elseif bootstrapClasses[class] then
-            for k, v in pairs(bootstrapClasses[class]) do
-                styles[k] = v
-            end
-        end
-    end
-    
-    return styles
+function Element.new(tagName, attributes)
+    local self = setmetatable({}, Element)
+    self.tagName = tagName:lower()
+    self.attributes = attributes or {}
+    self.style = {}
+    self.children = {}
+    self.parent = nil
+    self.classList = {}
+    self.id = attributes and attributes.id or nil
+    self.className = attributes and attributes.class or ""
+    self.innerHTML = ""
+    self.textContent = ""
+    self.value = attributes and attributes.value or ""
+    self.placeholder = attributes and attributes.placeholder or ""
+    self.src = attributes and attributes.src or ""
+    self.href = attributes and attributes.href or ""
+    self.eventListeners = {}
+    self.computedStyle = {}
+    self._guiObject = nil
+    return self
 end
 
-local function parseHTML(html)
-    local elements = {}
-    local currentText = ""
-    local i = 1
-    local stack = {elements}
-    
-    while i <= #html do
-        local tagStart = html:find("<", i)
-        
-        if not tagStart then
-            if currentText ~= "" then
-                table.insert(stack[#stack], {type = "text", content = currentText})
+function Element:appendChild(child)
+    table.insert(self.children, child)
+    child.parent = self
+    return child
+end
+
+function Element:removeChild(child)
+    for i, c in ipairs(self.children) do
+        if c == child then
+            table.remove(self.children, i)
+            child.parent = nil
+            if child._guiObject then
+                child._guiObject:Destroy()
             end
             break
         end
+    end
+end
+
+function Element:setAttribute(name, value)
+    self.attributes[name] = value
+    if name == "id" then
+        self.id = value
+    elseif name == "class" then
+        self.className = value
+        self.classList = {}
+        for class in value:gmatch("%S+") do
+            table.insert(self.classList, class)
+        end
+    elseif name == "style" then
+        self:_parseInlineStyle(value)
+    end
+end
+
+function Element:getAttribute(name)
+    return self.attributes[name]
+end
+
+function Element:addEventListener(event, callback)
+    if not self.eventListeners[event] then
+        self.eventListeners[event] = {}
+    end
+    table.insert(self.eventListeners[event], callback)
+end
+
+function Element:removeEventListener(event, callback)
+    if self.eventListeners[event] then
+        for i, cb in ipairs(self.eventListeners[event]) do
+            if cb == callback then
+                table.remove(self.eventListeners[event], i)
+                break
+            end
+        end
+    end
+end
+
+function Element:dispatchEvent(eventType, eventData)
+    if self.eventListeners[eventType] then
+        for _, callback in ipairs(self.eventListeners[eventType]) do
+            callback(eventData or {})
+        end
+    end
+end
+
+function Element:querySelector(selector)
+    return self:_findElement(selector, true)
+end
+
+function Element:querySelectorAll(selector)
+    return self:_findElement(selector, false)
+end
+
+function Element:_findElement(selector, findFirst)
+    local results = {}
+    
+    local function search(element)
+        local matches = false
         
-        if tagStart > i then
-            currentText = html:sub(i, tagStart - 1):gsub("^%s+", ""):gsub("%s+$", "")
-            if currentText ~= "" then
-                table.insert(stack[#stack], {type = "text", content = currentText})
+        if selector:match("^#") then
+            matches = element.id == selector:sub(2)
+        elseif selector:match("^%.") then
+            local className = selector:sub(2)
+            for _, cls in ipairs(element.classList) do
+                if cls == className then
+                    matches = true
+                    break
+                end
+            end
+        else
+            matches = element.tagName == selector
+        end
+        
+        if matches then
+            if findFirst then
+                return element
+            else
+                table.insert(results, element)
             end
         end
         
-        local tagEnd = html:find(">", tagStart)
-        if not tagEnd then break end
-        
-        local tag = html:sub(tagStart + 1, tagEnd - 1)
-        
-        if tag:match("^/") then
-            table.remove(stack)
-        else
-            local tagName = tag:match("^(%S+)")
-            local attrs = {}
-            
-            for attr, value in tag:gmatch('(%w+)=(["\'])([^"\']*)["\']') do
-                attrs[attr] = value
+        for _, child in ipairs(element.children) do
+            local result = search(child)
+            if result and findFirst then
+                return result
             end
-            
-            local element = {
-                type = "element",
-                tag = tagName,
-                attributes = attrs,
-                children = {}
+        end
+    end
+    
+    local result = search(self)
+    return findFirst and result or results
+end
+
+function Element:_parseInlineStyle(styleText)
+    for property in styleText:gmatch("[^;]+") do
+        local key, value = property:match("([^:]+):([^:]+)")
+        if key and value then
+            key = key:gsub("^%s+", ""):gsub("%s+$", "")
+            value = value:gsub("^%s+", ""):gsub("%s+$", "")
+            self.style[key] = value
+        end
+    end
+end
+
+local Document = {}
+Document.__index = Document
+
+function Document.new()
+    local self = setmetatable({}, Document)
+    self.documentElement = Element.new("html")
+    self.head = Element.new("head")
+    self.body = Element.new("body")
+    self.documentElement:appendChild(self.head)
+    self.documentElement:appendChild(self.body)
+    self.stylesheets = {}
+    return self
+end
+
+function Document:createElement(tagName)
+    return Element.new(tagName)
+end
+
+function Document:createTextNode(text)
+    local textNode = Element.new("#text")
+    textNode.textContent = text
+    return textNode
+end
+
+function Document:getElementById(id)
+    local function search(element)
+        if element.id == id then
+            return element
+        end
+        for _, child in ipairs(element.children) do
+            local result = search(child)
+            if result then return result end
+        end
+    end
+    return search(self.documentElement)
+end
+
+function Document:getElementsByClassName(className)
+    local results = {}
+    local function search(element)
+        for _, cls in ipairs(element.classList) do
+            if cls == className then
+                table.insert(results, element)
+                break
+            end
+        end
+        for _, child in ipairs(element.children) do
+            search(child)
+        end
+    end
+    search(self.documentElement)
+    return results
+end
+
+function Document:getElementsByTagName(tagName)
+    local results = {}
+    local function search(element)
+        if element.tagName == tagName:lower() then
+            table.insert(results, element)
+        end
+        for _, child in ipairs(element.children) do
+            search(child)
+        end
+    end
+    search(self.documentElement)
+    return results
+end
+
+function Document:querySelector(selector)
+    return self.documentElement:querySelector(selector)
+end
+
+function Document:querySelectorAll(selector)
+    return self.documentElement:querySelectorAll(selector)
+end
+
+local CSSEngine = {}
+
+function CSSEngine.parseCSS(cssText)
+    local rules = {}
+    cssText = cssText:gsub("/%*.-%*/", "")
+    
+    for ruleText in cssText:gmatch("[^}]+{[^}]*}") do
+        local selector, declarations = ruleText:match("([^{]+){([^}]*)}")
+        if selector and declarations then
+            selector = selector:gsub("^%s+", ""):gsub("%s+$", "")
+            local rule = {
+                selector = selector,
+                declarations = {}
             }
             
-            table.insert(stack[#stack], element)
-            
-            if not tag:match("/$") and tagName ~= "br" and tagName ~= "img" then
-                table.insert(stack, element.children)
+            for declaration in declarations:gmatch("[^;]+") do
+                local property, value = declaration:match("([^:]+):([^:]+)")
+                if property and value then
+                    property = property:gsub("^%s+", ""):gsub("%s+$", "")
+                    value = value:gsub("^%s+", ""):gsub("%s+$", "")
+                    rule.declarations[property] = value
+                end
             end
+            
+            table.insert(rules, rule)
         end
-        
-        i = tagEnd + 1
-        currentText = ""
     end
     
-    return elements
+    return rules
 end
 
-local function createInstance(element)
-    local instance
+function CSSEngine.computeStyle(element, stylesheets)
+    local computedStyle = {}
     
-    if element.tag == "div" then
-        instance = Instance.new("Frame")
-        instance.BorderSizePixel = 0
-        instance.BackgroundColor3 = Color3.fromHex("#FFFFFF")
-        instance.Size = UDim2.new(1, 0, 0, 100)
-    elseif element.tag == "button" then
-        instance = Instance.new("TextButton")
-        instance.BackgroundColor3 = Color3.fromHex("#007BFF")
-        instance.BorderSizePixel = 0
-        instance.Text = element.content or "Button"
-        instance.TextColor3 = Color3.fromHex("#FFFFFF")
-        instance.TextSize = 14
-        instance.Size = UDim2.new(0, 100, 0, 32)
-        
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 4)
-        corner.Parent = instance
-        
-    elseif element.tag == "input" then
-        instance = Instance.new("TextBox")
-        instance.BackgroundColor3 = Color3.fromHex("#FFFFFF")
-        instance.BorderColor3 = Color3.fromHex("#CED4DA")
-        instance.BorderSizePixel = 1
-        instance.PlaceholderText = element.attributes.placeholder or ""
-        instance.Text = ""
-        instance.TextSize = 14
-        instance.Size = UDim2.new(0, 200, 0, 36)
-        
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 4)
-        corner.Parent = instance
-        
-    elseif element.tag == "p" or element.tag == "span" or element.tag == "h1" or element.tag == "h2" then
-        instance = Instance.new("TextLabel")
-        instance.BackgroundTransparency = 1
-        instance.Text = element.content or ""
-        instance.TextColor3 = Color3.fromHex("#000000")
-        instance.TextSize = element.tag == "h1" and 24 or element.tag == "h2" and 20 or 16
-        instance.Size = UDim2.new(1, 0, 0, 30)
-        instance.TextXAlignment = Enum.TextXAlignment.Left
-        
-    elseif element.tag == "img" then
-        instance = Instance.new("ImageLabel")
-        instance.BackgroundTransparency = 1
-        instance.Image = element.attributes.src or ""
-        instance.Size = UDim2.new(0, 100, 0, 100)
-        
-    elseif element.tag == "i" then
-        instance = Instance.new("ImageLabel")
-        instance.BackgroundTransparency = 1
-        local iconClass = element.attributes.class
-        if iconClass and fontAwesomeIcons[iconClass] then
-            instance.Image = fontAwesomeIcons[iconClass]
+    for _, stylesheet in ipairs(stylesheets) do
+        for _, rule in ipairs(stylesheet) do
+            if CSSEngine.matchesSelector(element, rule.selector) then
+                for property, value in pairs(rule.declarations) do
+                    computedStyle[property] = value
+                end
+            end
         end
-        instance.Size = UDim2.new(0, 16, 0, 16)
+    end
+    
+    for property, value in pairs(element.style) do
+        computedStyle[property] = value
+    end
+    
+    element.computedStyle = computedStyle
+    return computedStyle
+end
+
+function CSSEngine.matchesSelector(element, selector)
+    if selector:match("^#") then
+        return element.id == selector:sub(2)
+    elseif selector:match("^%.") then
+        local className = selector:sub(2)
+        for _, cls in ipairs(element.classList) do
+            if cls == className then
+                return true
+            end
+        end
+        return false
+    else
+        return element.tagName == selector:lower()
+    end
+end
+
+local RenderEngine = {}
+
+function RenderEngine.createGuiObject(element)
+    local obj
+    local tag = element.tagName
+    
+    if tag == "div" or tag == "section" or tag == "main" or tag == "nav" or tag == "header" or tag == "footer" or tag == "article" then
+        obj = Instance.new("Frame")
+        obj.BackgroundColor3 = Color3.new(1, 1, 1)
+        obj.BorderSizePixel = 0
+        obj.Size = UDim2.new(1, 0, 0, 100)
+        
+    elseif tag == "p" or tag == "h1" or tag == "h2" or tag == "h3" or tag == "h4" or tag == "h5" or tag == "h6" or tag == "span" or tag == "label" then
+        obj = Instance.new("TextLabel")
+        obj.BackgroundTransparency = 1
+        obj.Text = element.textContent
+        obj.TextColor3 = Color3.new(0, 0, 0)
+        obj.TextSize = tag:match("^h(%d)") and (32 - tonumber(tag:match("^h(%d)")) * 4) or 16
+        obj.Font = Enum.Font.Gotham
+        obj.Size = UDim2.new(1, 0, 0, 30)
+        obj.TextXAlignment = Enum.TextXAlignment.Left
+        obj.TextWrapped = true
+        
+    elseif tag == "button" then
+        obj = Instance.new("TextButton")
+        obj.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
+        obj.BorderSizePixel = 0
+        obj.Text = element.textContent
+        obj.TextColor3 = Color3.new(1, 1, 1)
+        obj.TextSize = 14
+        obj.Font = Enum.Font.GothamMedium
+        obj.Size = UDim2.new(0, 120, 0, 36)
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 4)
+        corner.Parent = obj
+        
+        obj.MouseButton1Click:Connect(function()
+            element:dispatchEvent("click")
+        end)
+        
+    elseif tag == "input" then
+        obj = Instance.new("TextBox")
+        obj.BackgroundColor3 = Color3.new(1, 1, 1)
+        obj.BorderColor3 = Color3.fromRGB(209, 213, 219)
+        obj.BorderSizePixel = 1
+        obj.PlaceholderText = element.placeholder
+        obj.Text = element.value
+        obj.TextColor3 = Color3.new(0, 0, 0)
+        obj.TextSize = 14
+        obj.Font = Enum.Font.Gotham
+        obj.Size = UDim2.new(0, 200, 0, 36)
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 4)
+        corner.Parent = obj
+        
+        obj:GetPropertyChangedSignal("Text"):Connect(function()
+            element.value = obj.Text
+            element:dispatchEvent("input", {target = element})
+        end)
+        
+    elseif tag == "img" then
+        obj = Instance.new("ImageLabel")
+        obj.BackgroundTransparency = 1
+        obj.Image = element.src
+        obj.Size = UDim2.new(0, 100, 0, 100)
+        obj.ScaleType = Enum.ScaleType.Fit
+        
+    elseif tag == "textarea" then
+        obj = Instance.new("TextBox")
+        obj.BackgroundColor3 = Color3.new(1, 1, 1)
+        obj.BorderColor3 = Color3.fromRGB(209, 213, 219)
+        obj.BorderSizePixel = 1
+        obj.PlaceholderText = element.placeholder
+        obj.Text = element.value
+        obj.TextColor3 = Color3.new(0, 0, 0)
+        obj.TextSize = 14
+        obj.Font = Enum.Font.Gotham
+        obj.Size = UDim2.new(0, 300, 0, 100)
+        obj.MultiLine = true
+        obj.TextYAlignment = Enum.TextYAlignment.Top
+        
+    elseif tag == "a" then
+        obj = Instance.new("TextButton")
+        obj.BackgroundTransparency = 1
+        obj.Text = element.textContent
+        obj.TextColor3 = Color3.fromRGB(59, 130, 246)
+        obj.TextSize = 16
+        obj.Font = Enum.Font.Gotham
+        obj.Size = UDim2.new(1, 0, 0, 25)
+        obj.TextXAlignment = Enum.TextXAlignment.Left
+        
+        obj.MouseButton1Click:Connect(function()
+            element:dispatchEvent("click")
+        end)
         
     else
-        instance = Instance.new("Frame")
-        instance.BackgroundTransparency = 1
-        instance.Size = UDim2.new(1, 0, 0, 50)
+        obj = Instance.new("Frame")
+        obj.BackgroundTransparency = 1
+        obj.Size = UDim2.new(1, 0, 0, 50)
     end
     
-    return instance
+    obj.Name = element.id or element.tagName
+    return obj
 end
 
-local function applyStyle(instance, styles)
-    for prop, value in pairs(styles) do
-        if prop == "background" then
-            instance.BackgroundColor3 = Color3.fromHex(value)
-        elseif prop == "color" then
-            if instance:IsA("TextLabel") or instance:IsA("TextButton") or instance:IsA("TextBox") then
-                instance.TextColor3 = Color3.fromHex(value)
-            end
-        elseif prop == "fontSize" then
-            if instance:IsA("TextLabel") or instance:IsA("TextButton") or instance:IsA("TextBox") then
-                instance.TextSize = value
-            end
-        elseif prop == "cornerRadius" then
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(0, value)
-            corner.Parent = instance
-        elseif prop == "padding" then
-            local padding = Instance.new("UIPadding")
-            if type(value) == "number" then
-                padding.PaddingTop = UDim.new(0, value)
-                padding.PaddingBottom = UDim.new(0, value)
-                padding.PaddingLeft = UDim.new(0, value)
-                padding.PaddingRight = UDim.new(0, value)
-            elseif type(value) == "table" then
-                padding.PaddingTop = UDim.new(0, value[1] or 0)
-                padding.PaddingRight = UDim.new(0, value[2] or 0)
-                padding.PaddingBottom = UDim.new(0, value[3] or 0)
-                padding.PaddingLeft = UDim.new(0, value[4] or 0)
-            end
-            padding.Parent = instance
-        elseif prop == "width" then
-            if type(value) == "string" and value:match("%%") then
-                local percent = tonumber(value:match("(%d+)%%")) / 100
-                instance.Size = UDim2.new(percent, 0, instance.Size.Y.Scale, instance.Size.Y.Offset)
-            elseif type(value) == "number" then
-                instance.Size = UDim2.new(0, value, instance.Size.Y.Scale, instance.Size.Y.Offset)
-            end
-        elseif prop == "height" then
-            if type(value) == "string" and value:match("%%") then
-                local percent = tonumber(value:match("(%d+)%%")) / 100
-                instance.Size = UDim2.new(instance.Size.X.Scale, instance.Size.X.Offset, percent, 0)
-            elseif type(value) == "number" then
-                instance.Size = UDim2.new(instance.Size.X.Scale, instance.Size.X.Offset, 0, value)
-            end
-        elseif prop == "layout" and value == "flex" then
-            local layout = Instance.new("UIListLayout")
-            layout.SortOrder = Enum.SortOrder.LayoutOrder
-            layout.Parent = instance
-        elseif prop == "direction" and value == "column" then
-            local layout = instance:FindFirstChildOfClass("UIListLayout")
-            if layout then
+function RenderEngine.applyStyles(obj, element)
+    local style = element.computedStyle
+    
+    for property, value in pairs(style) do
+        if property == "width" then
+            obj.Size = UDim2.new(RenderEngine.parseSize(value), obj.Size.Y)
+        elseif property == "height" then
+            obj.Size = UDim2.new(obj.Size.X, RenderEngine.parseSize(value))
+        elseif property == "background-color" or property == "background" then
+            obj.BackgroundColor3 = RenderEngine.parseColor(value)
+        elseif property == "color" and (obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox")) then
+            obj.TextColor3 = RenderEngine.parseColor(value)
+        elseif property == "font-size" and (obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox")) then
+            obj.TextSize = tonumber(value:match("(%d+)")) or 16
+        elseif property == "border-radius" then
+            local corner = obj:FindFirstChildOfClass("UICorner") or Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, tonumber(value:match("(%d+)")) or 0)
+            corner.Parent = obj
+        elseif property == "padding" then
+            local padding = obj:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding")
+            local val = tonumber(value:match("(%d+)")) or 0
+            padding.PaddingTop = UDim.new(0, val)
+            padding.PaddingRight = UDim.new(0, val)
+            padding.PaddingBottom = UDim.new(0, val)
+            padding.PaddingLeft = UDim.new(0, val)
+            padding.Parent = obj
+        elseif property == "display" then
+            if value == "none" then
+                obj.Visible = false
+            elseif value == "flex" then
+                local layout = Instance.new("UIListLayout")
+                layout.SortOrder = Enum.SortOrder.LayoutOrder
+                layout.FillDirection = Enum.FillDirection.Horizontal
+                layout.Parent = obj
+            elseif value == "block" then
+                local layout = Instance.new("UIListLayout")
+                layout.SortOrder = Enum.SortOrder.LayoutOrder
                 layout.FillDirection = Enum.FillDirection.Vertical
+                layout.Parent = obj
             end
+        elseif property == "position" then
+            if value == "absolute" then
+                obj.Position = UDim2.new(0, 0, 0, 0)
+            end
+        elseif property == "opacity" then
+            local alpha = tonumber(value) or 1
+            obj.BackgroundTransparency = 1 - alpha
         end
     end
 end
 
-local function renderElement(element, parent, jsEnv)
-    if element.type == "text" then
-        local textLabel = Instance.new("TextLabel")
-        textLabel.BackgroundTransparency = 1
-        textLabel.Text = element.content
-        textLabel.TextColor3 = Color3.fromHex("#000000")
-        textLabel.TextSize = 16
-        textLabel.Size = UDim2.new(1, 0, 0, 20)
-        textLabel.TextXAlignment = Enum.TextXAlignment.Left
-        textLabel.Parent = parent
-        return textLabel
+function RenderEngine.parseSize(value)
+    if value:match("%%$") then
+        return UDim.new(tonumber(value:match("(.-)%%")) / 100, 0)
+    elseif value:match("px$") then
+        return UDim.new(0, tonumber(value:match("(.-)px")))
+    elseif value:match("vw$") then
+        local vw = tonumber(value:match("(.-)vw")) / 100
+        return UDim.new(0, workspace.CurrentCamera.ViewportSize.X * vw)
+    elseif value:match("vh$") then
+        local vh = tonumber(value:match("(.-)vh")) / 100
+        return UDim.new(0, workspace.CurrentCamera.ViewportSize.Y * vh)
+    else
+        return UDim.new(0, tonumber(value) or 100)
     end
-    
-    local instance = createInstance(element)
-    local styles = parseClasses(element.attributes.class)
-    
-    applyStyle(instance, styles)
-    
-    if element.attributes.onclick then
-        local funcName = element.attributes.onclick:match("([%w_]+)")
-        if funcName and jsEnv[funcName] then
-            instance.MouseButton1Click:Connect(jsEnv[funcName])
-        end
-    end
-    
-    if element.children then
-        for _, child in ipairs(element.children) do
-            renderElement(child, instance, jsEnv)
-        end
-    end
-    
-    instance.Parent = parent
-    return instance
 end
 
-function Lumin.render(html, css, js, parent)
-    local jsEnv = {
-        print = print,
-        game = game,
-        workspace = workspace,
-        wait = wait,
-        spawn = spawn,
-        TweenService = TweenService
+function RenderEngine.parseColor(color)
+    if color:match("^#") then
+        local hex = color:sub(2)
+        if #hex == 3 then hex = hex:gsub("(.)", "%1%1") end
+        local r = tonumber(hex:sub(1,2), 16) / 255
+        local g = tonumber(hex:sub(3,4), 16) / 255
+        local b = tonumber(hex:sub(5,6), 16) / 255
+        return Color3.new(r, g, b)
+    elseif color:match("^rgb") then
+        local r, g, b = color:match("rgb%((%d+),%s*(%d+),%s*(%d+)%)")
+        return Color3.new(r/255, g/255, b/255)
+    else
+        return Color3.new(1, 1, 1)
+    end
+end
+
+function RenderEngine.render(element, parent, stylesheets)
+    CSSEngine.computeStyle(element, stylesheets)
+    
+    local obj = RenderEngine.createGuiObject(element)
+    RenderEngine.applyStyles(obj, element)
+    
+    element._guiObject = obj
+    obj.Parent = parent
+    
+    for _, child in ipairs(element.children) do
+        if child.tagName ~= "#text" then
+            RenderEngine.render(child, obj, stylesheets)
+        end
+    end
+    
+    return obj
+end
+
+local JavaScriptEngine = {}
+
+function JavaScriptEngine.createGlobalEnvironment(document, window)
+    return {
+        document = document,
+        window = window,
+        console = {
+            log = function(...) print("[Console]", ...) end,
+            warn = function(...) warn("[Console]", ...) end,
+            error = function(...) error("[Console] " .. tostring(...)) end
+        },
+        setTimeout = function(callback, delay)
+            spawn(function()
+                wait((delay or 0) / 1000)
+                callback()
+            end)
+        end,
+        setInterval = function(callback, interval)
+            spawn(function()
+                while true do
+                    wait((interval or 1000) / 1000)
+                    callback()
+                end
+            end)
+        end,
+        alert = function(message)
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Alert";
+                Text = tostring(message);
+                Duration = 5;
+            })
+        end,
+        confirm = function(message)
+            return true
+        end,
+        JSON = {
+            stringify = function(obj)
+                return game:GetService("HttpService"):JSONEncode(obj)
+            end,
+            parse = function(str)
+                return game:GetService("HttpService"):JSONDecode(str)
+            end
+        }
+    }
+end
+
+function Lumin.createWebPage(html, css, js, parent)
+    local document = Document.new()
+    local window = {
+        document = document,
+        location = {href = "roblox://lumin"},
+        history = {},
+        navigator = {userAgent = "Lumin/4.0"}
     }
     
-    for name, func in pairs(Lumin.globals) do
-        jsEnv[name] = func
+    if html then
+        document.body.innerHTML = html
+        local htmlElements = Lumin._parseHTML(html)
+        for _, element in ipairs(htmlElements) do
+            document.body:appendChild(element)
+        end
     end
+    
+    local stylesheets = {}
+    if css then
+        table.insert(stylesheets, CSSEngine.parseCSS(css))
+    end
+    
+    local jsEnv = JavaScriptEngine.createGlobalEnvironment(document, window)
     
     if js then
         local jsFunc = loadstring(js)
         if jsFunc then
             setfenv(jsFunc, jsEnv)
-            jsFunc()
+            pcall(jsFunc)
         end
     end
     
-    local elements = parseHTML(html)
-    local instances = {}
-    
-    for _, element in ipairs(elements) do
-        table.insert(instances, renderElement(element, parent, jsEnv))
+    local renderedObjects = {}
+    for _, element in ipairs(document.body.children) do
+        table.insert(renderedObjects, RenderEngine.render(element, parent, stylesheets))
     end
     
-    return instances
+    return {
+        document = document,
+        window = window,
+        objects = renderedObjects,
+        refresh = function()
+            for _, obj in ipairs(renderedObjects) do
+                obj:Destroy()
+            end
+            renderedObjects = {}
+            for _, element in ipairs(document.body.children) do
+                table.insert(renderedObjects, RenderEngine.render(element, parent, stylesheets))
+            end
+        end
+    }
 end
 
-function Lumin.registerGlobal(name, func)
-    Lumin.globals[name] = func
+function Lumin._parseHTML(html)
+    local elements = {}
+    local stack = {}
+    
+    for tag in html:gmatch("<[^>]+>") do
+        if tag:match("^</") then
+            table.remove(stack)
+        else
+            local tagName = tag:match("<([%w%-]+)")
+            local attrs = {}
+            
+            for attr, quote, value in tag:gmatch('([%w%-]+)=(["\'])(.-)["\']') do
+                attrs[attr] = value
+            end
+            
+            local element = Element.new(tagName, attrs)
+            
+            if #stack > 0 then
+                stack[#stack]:appendChild(element)
+            else
+                table.insert(elements, element)
+            end
+            
+            if not tag:match("/>$") and not tagName:match("^(br|hr|img|input)$") then
+                table.insert(stack, element)
+            end
+        end
+    end
+    
+    return elements
 end
-
-function Lumin.animate(instance, properties, duration, easing)
-    local tweenInfo = TweenInfo.new(
-        duration or 0.3,
-        easing or Enum.EasingStyle.Quad,
-        Enum.EasingDirection.Out
-    )
-    local tween = TweenService:Create(instance, tweenInfo, properties)
-    tween:Play()
-    return tween
-end
-
-function Lumin.addTailwindClass(className, styles)
-    tailwindClasses[className] = styles
-end
-
-function Lumin.addBootstrapClass(className, styles)
-    bootstrapClasses[className] = styles
-end
-
-function Lumin.addFontAwesome(iconName, imageId)
-    fontAwesomeIcons[iconName] = imageId
-end
-
-Lumin.registerGlobal("animate", Lumin.animate)
-Lumin.registerGlobal("HttpService", HttpService)
 
 return Lumin
